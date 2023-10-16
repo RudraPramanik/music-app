@@ -1,10 +1,42 @@
+import React, { useState, useEffect } from 'react';
+import type { PropsWithChildren } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import TrackPlayer from 'react-native-track-player';
+import { playbackService } from './musicPlayerService';
+import { addTrack, setUpPlayer } from './musicPlayerService';
 
-export default function App() {
+// AppRegistry.registerComponent(...);
+TrackPlayer.registerPlaybackService(() => playbackService);
+export default function App(): JSX.Element {
+  const [isplayerReady, setPlayerIsReady] = useState(false);
+  async function setup() {
+    let isSetup = await setUpPlayer();
+    if (isSetup) {
+      await addTrack();
+    }
+    setPlayerIsReady(isSetup);
+  }
+  useEffect(() => {
+    setup();
+  }, []);
+  if (!isplayerReady) {
+    return (
+      <SafeAreaView>
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>Testing seems okay</Text>
       <StatusBar style="auto" />
     </View>
   );
